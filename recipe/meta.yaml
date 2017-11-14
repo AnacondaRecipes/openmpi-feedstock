@@ -18,16 +18,16 @@ build:
 
 requirements:
     build:
-        - toolchain
-        - gcc  # [not win]
+        - {{ compiler("c") }} # [not win]
+        - {{ compiler("cxx") }} # [not win]
+        - {{ compiler("fortran") }} # [not win]
         - perl
-    run:
-        - libgcc  # [linux]
-        - libgfortran  # [osx]
 
 test:
     requires:
-        - gcc  # [not win]
+        - {{ compiler("c") }} # [not win]
+        - {{ compiler("cxx") }} # [not win]
+        - {{ compiler("fortran") }} # [not win]
     files:
         - tests/helloworld.c
         - tests/helloworld.cxx
