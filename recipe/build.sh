@@ -5,7 +5,7 @@
             --enable-mpi-cxx \
             --enable-mpi-fortran
 
-export FCFLAGS="$FLAGS"
+export FCFLAGS="$FFLAGS"
 
 make -j$CPU_COUNT
 make install
