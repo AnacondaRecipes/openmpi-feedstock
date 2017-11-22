@@ -1,11 +1,12 @@
 #!/bin/bash
 
+export LDFLAGS="$LDFLAGS -Wl,-rpath,${CONDA_PREFIX}/lib"
+
+export FCFLAGS="$FFLAGS"
 ./configure --prefix=$PREFIX \
             --disable-dependency-tracking \
             --enable-mpi-cxx \
             --enable-mpi-fortran
-
-export FCFLAGS="$FFLAGS"
 
 make -j$CPU_COUNT
 make install
