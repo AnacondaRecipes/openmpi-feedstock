@@ -1,8 +1,11 @@
 #!/bin/bash
 
-export LDFLAGS="$LDFLAGS -Wl,-rpath,${CONDA_PREFIX}/lib"
+if [[ $OSTYPE == darwin* ]]; then
+    export LDFLAGS="$LDFLAGS -Wl,-rpath,${CONDA_PREFIX}/lib"
+fi
 
 export FCFLAGS="$FFLAGS"
+
 ./configure --prefix=$PREFIX \
             --disable-dependency-tracking \
             --enable-mpi-cxx \
