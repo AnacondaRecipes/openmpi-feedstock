@@ -1,56 +1,57 @@
-# This file was generated automatically from conda-smithy. To update this configuration,
-# update the conda-forge.yml and/or the recipe/meta.yaml.
+# The language in this case has no bearing - we are going to be making use of "conda" for a
+# python distribution for the scientific python stack.
+language: c
 
-language: generic
+os:
+  - linux
+  - osx
 
-os: osx
 osx_image: xcode6.4
 
 env:
-  global:
-    # The BINSTAR_TOKEN secure variable. This is defined canonically in conda-forge.yml.
-    - secure: "HLvg/O3y2I2hdradv2yUpVLYyt3PVkISg30vwSAujlJVgTrPNOuw295KMkjzqfUV5QPa6hgtp2bDBYnEVktnSe0sPx4jwKxzUkkDr4LfYvp6shOpeo4GedG12MvXU2ymBvZ4n2jQRQNrASt0WWdF1a654fTXH2TjQmYNamK5Fdqot/PCBfnNcoBzrWhDS5zBehrDlGICUzuvQU+GejS9gyPHCOx6PpkC3Oautx2hIYrn3ZxkIPs4wCjlR08TnQ1Ku5V+4ex6+ugDYLOaqS4kSaCVTmA/WJY0kshetjW1/7Dtkdo30XDnzR0Yvv9ZI+oJefwISC4XZvUF/5gHhYYAZCmgABxp3QTSKw1cDauetubrEXF0WLw5OGHSSN5O20yiL5j87JpD93j3iwUaIwezj+qWQb/4DKiJlLz6KH0zdrOD89Jui5pv3YZUjs0zFDkdEX86viXA8kzjtbK/rdJm9x5z9A+U0pUycfutMZUp56L8v5TOArAfumPPSfMdqgYqkMg/Iod7pnUiskwBoDzNJTevENk8PiUqGtiplbzll2AjwlvCEA+QmHwkXgct+fTfOqmFW5i74bdidqDwubb5VrWSgoWHUZINMU24sripf9Q/k3rHtGS6y9JAhFVDkPqBlBsMy7CYVyr63N871++sVUIks0HMkfEB9lPE2uEyHmM="
+    matrix:
+        - PYTHON_VERSION=3.6
 
-
-before_install:
-    # Fast finish the PR.
-    - |
-      (curl https://raw.githubusercontent.com/conda-forge/conda-forge-build-setup-feedstock/master/recipe/ff_ci_pr_build.py | \
-          python - -v --ci "travis" "${TRAVIS_REPO_SLUG}" "${TRAVIS_BUILD_NUMBER}" "${TRAVIS_PULL_REQUEST}") || exit 1
-
-    # Remove homebrew.
-    - |
-      echo ""
-      echo "Removing homebrew from Travis CI to avoid conflicts."
-      curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall > ~/uninstall_homebrew
-      chmod +x ~/uninstall_homebrew
-      ~/uninstall_homebrew -fq
-      rm ~/uninstall_homebrew
-
+    global:
+        - TARGET_ARCH="x64"
+        - CONDA_INSTALL_LOCN="${HOME}/miniconda"
 
 install:
-    # Install Miniconda.
-    - |
-      echo ""
-      echo "Installing a fresh version of Miniconda."
-      MINICONDA_URL="https://repo.continuum.io/miniconda"
-      MINICONDA_FILE="Miniconda3-latest-MacOSX-x86_64.sh"
-      curl -L -O "${MINICONDA_URL}/${MINICONDA_FILE}"
-      bash $MINICONDA_FILE -b
+    # Install and set up miniconda.
+    - if [ $TRAVIS_OS_NAME == "linux" ]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
+    - if [ $TRAVIS_OS_NAME == "osx" ]; then wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh; fi
+    - bash miniconda.sh -b -p $CONDA_INSTALL_LOCN
+    - export PATH=${CONDA_INSTALL_LOCN}/bin:$PATH
+    - conda config --set always_yes true
 
-    # Configure conda.
-    - |
-      echo ""
-      echo "Configuring conda."
-      source /Users/travis/miniconda3/bin/activate root
-      conda config --remove channels defaults
-      conda config --add channels defaults
-      #conda config --add channels conda-forge
-      conda config --set show_channel_urls true
-      #conda install --yes --quiet conda-forge-build-setup
-      #source run_conda_forge_build_setup
-      conda install --yes conda-build
+    # pin conda verson to 4.3.22
+    #- conda config --set auto_update_conda False
+    #- echo "conda ==4.3.22" >> ${CONDA_INSTALL_LOCN}/conda-meta/pinned
+
+    - conda install --quiet conda
+
+    # set the ordering of additional channels
+    - conda config --prepend channels defaults
+    - conda config --append channels bccp
+    - conda config --append channels astropy
+
+    # Install a couple of dependencies we need for sure.
+    - conda install --quiet --yes astropy anaconda-client=1.6.2 jinja2 cython pycrypto
+    - conda install ruamel_yaml
+
+    # latest conda build
+    - conda install 'conda-build'
+
+    # to get fallback openmpi/mpich2
+    # trying to work around https://github.com/conda/conda-build/issues/2510
+    - conda install mpi4py
+
+    # To ease debugging, list installed packages
+    - conda info -a
+    - conda list
 script:
-  - conda build ./recipe
-
-  - upload_or_check_non_existence ./recipe conda-forge --channel=main
+    # Only upload if this is NOT a pull request.
+    # Get ready to build.
+    # Packages are uploaded as they are built.
+    - |
+       conda build recipe;
