@@ -12,13 +12,16 @@ source:
   sha256: {{ sha256 }}
 
 build:
-  number: 1001
+  number: 1
   skip: True  # [win]
 
 outputs:
   - name: openmpi
     script: build-openmpi.sh
     build:
+      missing_dso_whitelist:
+        - "*/libutil*"
+        - "*/librt.so*"
       run_exports:
         - {{ pin_subpackage('openmpi', min_pin='x.x.x', max_pin='x.x') }}
 
@@ -29,6 +32,7 @@ outputs:
         - {{ compiler('fortran') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
+        - zlib
       run:
         - mpi 1.0 openmpi
     test:
@@ -38,6 +42,11 @@ outputs:
         - tests/test_exec.py
       requires:
         - python >=3
+
+  - name: mpi
+    version: 1.0
+    build:
+      string: openmpi
 
   - name: openmpi-mpicc
     build:
