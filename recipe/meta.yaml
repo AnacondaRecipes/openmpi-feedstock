@@ -1,4 +1,4 @@
-{% set version = "4.0.2" %}
+{% set version = "4.1.1rc2" %}
 {% set major = version.rpartition('.')[0] %}
 
 package:
@@ -9,7 +9,7 @@ package:
 source:
   fn: openmpi-{{ version }}.tar.bz2
   url: https://www.open-mpi.org/software/ompi/v{{ major }}/downloads/openmpi-{{ version }}.tar.bz2
-  sha256: 900bf751be72eccf06de9d186f7b1c4b5c2fa9fa66458e53b77778dffdfe4057
+  sha256: f7d572621c93934b329281ee159c89124905ef05900d1a817efb7d262442d0f3
   patches:
     - 0001-common-ompio-fix-calculation-in-simple-grouping-opti.patch
 
