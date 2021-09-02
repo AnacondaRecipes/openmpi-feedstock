@@ -1,13 +1,5 @@
 #!/bin/bash
 
-if [[ $target_platform == osx-arm64 ]]; then
-    list_config_to_patch=$(find . -name config.guess | sed -E 's/config.guess//')
-    for config_folder in $list_config_to_patch; do
-        echo "copying config to $config_folder ...\n"
-        cp -v $BUILD_PREFIX/share/libtool/build-aux/config.* $config_folder
-    done
-fi
-
 # unset unused old fortran compiler vars
 unset F90 F77
 
@@ -20,6 +12,9 @@ export CC=$(basename "$CC")
 export CXX=$(basename "$CXX")
 export FC=$(basename "$FC")
 
+./autogen.pl --force
+
+EXTRA_CONF=
 if [ $(uname) == Darwin ]; then
     if [[ ! -z "$CONDA_BUILD_SYSROOT" ]]; then
         export CFLAGS="$CFLAGS -isysroot $CONDA_BUILD_SYSROOT"
@@ -34,12 +29,14 @@ if [ $(uname) == Darwin ]; then
     # grep -l '/VERSION' -R . | xargs sed -i "" s@/VERSION@/VERSION.sh@g
     mv -v VERSION VERSION.sh
     sed -i "" s@/VERSION@/VERSION.sh@g configure
+    EXTRA_CONF="--disable-builtin-atomics"
 fi
 
 export LIBRARY_PATH="$PREFIX/lib"
 
 ./configure --prefix=$PREFIX \
             --disable-dependency-tracking \
+            ${EXTRA_CONF} --enable-ipv6 \
             --enable-mpi-cxx \
             --enable-mpi-fortran \
             --disable-wrapper-rpath \
