@@ -29,7 +29,9 @@ outputs:
         - {{ compiler('cxx') }}
         - {{ compiler('fortran') }}
         - make  # [unix]
-        - perl 5.26.2
+        - perl 5.26.2  # [not arm64]
+        - perl >=5.26  # [arm64]
+        - libtool
       host:
         - zlib
       run:

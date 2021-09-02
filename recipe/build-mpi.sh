@@ -1,5 +1,13 @@
 #!/bin/bash
 
+if [[ $target_platform == osx-arm64 ]]; then
+    list_config_to_patch=$(find . -name config.guess | sed -E 's/config.guess//')
+    for config_folder in $list_config_to_patch; do
+        echo "copying config to $config_folder ...\n"
+        cp -v $BUILD_PREFIX/share/libtool/build-aux/config.* $config_folder
+    done
+fi
+
 # unset unused old fortran compiler vars
 unset F90 F77
 
