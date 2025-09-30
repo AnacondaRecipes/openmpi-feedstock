@@ -1,20 +1,15 @@
 #!/bin/bash
 set -ex
 
-export OMPI_MCA_plm=isolated
-export OMPI_MCA_btl_vader_single_copy_mechanism=none
-export OMPI_MCA_rmaps_base_oversubscribe=yes
-export OMPI_MCA_pml=ob1
-
 if [[ "$(uname)" == "Darwin" ]]; then
-  export MACOSX_DEPLOYMENT_TARGET=12.1
+  export MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-12.1}"
   export SDKROOT="${CONDA_BUILD_SYSROOT:-${SDKROOT:-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk}}"
   export DYLD_LIBRARY_PATH="$PREFIX/lib:${DYLD_LIBRARY_PATH:-}"
   export OMPI_MCA_plm=isolated
   export OMPI_MCA_pml=ob1
-  export OMPI_MCA_rmaps_base_oversubscribe=yes
   export OMPI_MCA_btl=self,tcp
   export OMPI_MCA_oob_tcp_if_include=lo0
+  export OMPI_MCA_rmaps_base_oversubscribe=yes
   export OMPI_MCA_btl_vader_single_copy_mechanism=none
 fi
 
@@ -74,41 +69,53 @@ fi
 
 if [[ $PKG_NAME == "openmpi-mpifort" ]]; then
   set -euo pipefail
+  echo "== where am I =="
+  pwd
+  ls -lah .
 
   command -v mpifort
   echo "== mpifort -show =="; mpifort -show || true
   echo "== mpifort -showme:compile =="; mpifort -showme:compile || true
   echo "== mpifort -showme:link    =="; mpifort -showme:link || true
 
-  echo "== Folders and files =="
-  pwd; ls -l .
+  # Проверим наличие исходников
+  [[ -f helloworld.f ]]   || { echo "Нет tests/helloworld.f"; exit 1; }
+  [[ -f helloworld.f90 ]] || { echo "Нет tests/helloworld.f90"; exit 1; }
 
-  [[ -f helloworld.f && -f helloworld.f90 ]] || { echo "Нет helloworld.f/helloworld.f90"; exit 1; }
-
-  # --- F77 ---
-  echo "== Compilation F77 =="
-  mpifort -v -c ${FFLAGS:-} helloworld.f
-  echo "== After compilation =="
-  ls -l *.o || true
-
-  obj_f=$(echo *.o | tr ' ' '\n' | grep -E '^helloworld\.o$' || true)
-  [[ -n "${obj_f}" ]] || { echo "Object file for helloworld.f not found"; exit 1; }
-  echo "== Linking F77 =="
-  mpifort -v ${LDFLAGS:-} "${obj_f}" -o helloworld1_f
+  echo "== Сборка и запуск F77 (одним шагом) =="
+  set -x
+  mpifort ${FFLAGS:-} helloworld.f   -o helloworld1_f   ${LDFLAGS:-}
+  set +x
+  ls -l helloworld1_f
+  set -x
   $MPIEXEC -n 4 ./helloworld1_f
+  set +x
 
-  rm -f *.o
-
-  # --- F90 ---
-  echo "== Compilation F90 =="
-  mpifort -v -c ${FFLAGS:-} helloworld.f90
-  echo "== After compilation =="
-  ls -l *.o || true
-  obj_f90=$(echo *.o | tr ' ' '\n' | grep -E '^helloworld\.o$' || true)
-  [[ -n "${obj_f90}" ]] || { echo "Object file for helloworld.f90 not found"; exit 1; }
-  echo "== Linking F90 =="
-  mpifort -v ${LDFLAGS:-} "${obj_f90}" -o helloworld1_f90
+  echo "== Сборка и запуск F90 (одним шагом) =="
+  set -x
+  mpifort ${FFLAGS:-} helloworld.f90 -o helloworld1_f90 ${LDFLAGS:-}
+  set +x
+  ls -l helloworld1_f90
+  set -x
   $MPIEXEC -n 4 ./helloworld1_f90
+  set +x
+
+  # Опционально — старые интерфейсы, если нужны:
+  if command -v mpif77 >/dev/null 2>&1; then
+    echo "== mpif77 -show =="; mpif77 -show || true
+    set -x
+    mpif77  ${FFLAGS:-} helloworld.f   -o helloworld2_f   ${LDFLAGS:-}
+    $MPIEXEC -n 4 ./helloworld2_f
+    set +x
+  fi
+
+  if command -v mpif90 >/dev/null 2>&1; then
+    echo "== mpif90 -show =="; mpif90 -show || true
+    set -x
+    mpif90  ${FFLAGS:-} helloworld.f90 -o helloworld2_f90 ${LDFLAGS:-}
+    $MPIEXEC -n 4 ./helloworld2_f90
+    set +x
+  fi
 fi
 
 
