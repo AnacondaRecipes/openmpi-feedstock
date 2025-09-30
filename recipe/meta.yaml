@@ -19,9 +19,6 @@ outputs:
   - name: openmpi
     script: build-mpi.sh
     build:
-      ignore_run_exports_from:
-        - {{ compiler('cxx') }}      # [osx]
-        - {{ compiler('fortran') }}  # [osx]
       run_exports:
         - {{ pin_subpackage('openmpi', min_pin='x.x.x', max_pin='x.x') }}
     requirements:
@@ -55,9 +52,6 @@ outputs:
         # make CONDA_BUILD_SYSROOT a 'used variable'
         # so that conda-build knows to pass it to the test env
         - echo "{{CONDA_BUILD_SYSROOT}}"  # [osx]
-      ignore_run_exports_from:
-        - {{ compiler('cxx') }}      # [osx]
-        - {{ compiler('fortran') }}  # [osx]
     requirements:
       run:
         - {{ pin_subpackage('openmpi', exact=True) }}
@@ -76,9 +70,6 @@ outputs:
         # make CONDA_BUILD_SYSROOT a 'used variable'
         # so that conda-build knows to pass it to the test env
         - echo "{{CONDA_BUILD_SYSROOT}}"  # [osx]
-      ignore_run_exports_from:
-        - {{ compiler('cxx') }}      # [osx]
-        - {{ compiler('fortran') }}  # [osx]
     requirements:
       run:
         - {{ pin_subpackage('openmpi', exact=True) }}
@@ -97,19 +88,16 @@ outputs:
         # make CONDA_BUILD_SYSROOT a 'used variable'
         # so that conda-build knows to pass it to the test env
         - echo "{{CONDA_BUILD_SYSROOT}}"  # [osx]
-      ignore_run_exports_from:
-        - {{ compiler('cxx') }}      # [osx]
-        - {{ compiler('fortran') }}  # [osx]
     requirements:
       run:
         - {{ pin_subpackage('openmpi', exact=True) }}
         - {{ compiler('fortran') }}
-    # test:
-    #   script: run_test.sh
-    #   files:
-    #     - mpiexec.sh
-    #     - tests/helloworld.f
-    #     - tests/helloworld.f90
+    test:
+      script: run_test.sh
+      files:
+        - mpiexec.sh
+        - tests/helloworld.f
+        - tests/helloworld.f90
 
 about:
     home: https://www.open-mpi.org
