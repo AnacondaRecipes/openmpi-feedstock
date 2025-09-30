@@ -210,11 +210,13 @@ if [[ $PKG_NAME == "openmpi-mpifort" ]]; then
   [[ -f helloworld.f   ]] || { echo "helloworld.f not found"; exit 1; }
   [[ -f helloworld.f90 ]] || true
 
-  # set -x
-  # "$FC_BIN" ${FFLAGS:-} $CMP_FLAGS -c ./helloworld.f   -o hello_f.o
-  # "$FC_BIN" hello_f.o   $LNK_FLAGS ${LDFLAGS:-}        -o helloworld1_f
-  # set +x
-  # $MPIEXEC -n 4 ./helloworld1_f
+  set -x
+  gfortran --version
+  "$FC_BIN" --version
+  "$FC_BIN" ${FFLAGS:-} $CMP_FLAGS -c ./helloworld.f   -o hello_f.o
+  "$FC_BIN" hello_f.o   $LNK_FLAGS ${LDFLAGS:-}        -o helloworld1_f
+  set +x
+  $MPIEXEC -n 4 ./helloworld1_f
 
   if [[ -f helloworld.f90 ]]; then
     set -x
