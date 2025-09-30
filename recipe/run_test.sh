@@ -42,84 +42,31 @@ if [[ $PKG_NAME == "openmpi-mpicxx" ]]; then
   $MPIEXEC -n 4 ./helloworld_cxx
 fi
 
-# if [[ $PKG_NAME == "openmpi-mpifort" ]]; then
-#   command -v mpifort
-#   mpifort -show
-
-#   mpifort $FFLAGS $LDFLAGS helloworld.f -o helloworld1_f
-#   $MPIEXEC -n 4 ./helloworld1_f
-
-#   mpifort $FFLAGS $LDFLAGS helloworld.f90 -o helloworld1_f90
-#   $MPIEXEC -n 4 ./helloworld1_f90
-
-#   command -v mpif77
-#   mpif77 -show
-
-#   mpif77 $FFLAGS $LDFLAGS helloworld.f -o helloworld2_f
-#   $MPIEXEC -n 4 ./helloworld2_f
-
-#   command -v mpif90
-#   mpif90 -show
-
-#   mpif90 $FFLAGS $LDFLAGS helloworld.f90 -o helloworld2_f90
-#   $MPIEXEC -n 4 ./helloworld2_f90
-
-# fi
-
-
 if [[ $PKG_NAME == "openmpi-mpifort" ]]; then
-  set -euo pipefail
-  echo "== where am I =="
-  pwd
-  ls -lah .
 
   command -v mpifort
   echo "== mpifort -show =="; mpifort -show || true
   echo "== mpifort -showme:compile =="; mpifort -showme:compile || true
   echo "== mpifort -showme:link    =="; mpifort -showme:link || true
 
-  # Проверим наличие исходников
-  [[ -f helloworld.f ]]   || { echo "Нет tests/helloworld.f"; exit 1; }
-  [[ -f helloworld.f90 ]] || { echo "Нет tests/helloworld.f90"; exit 1; }
-
-  echo "== Сборка и запуск F77 (одним шагом) =="
-  set -x
   mpifort ${FFLAGS:-} helloworld.f   -o helloworld1_f   ${LDFLAGS:-}
-  set +x
-  ls -l helloworld1_f
-  set -x
   $MPIEXEC -n 4 ./helloworld1_f
-  set +x
 
-  echo "== Сборка и запуск F90 (одним шагом) =="
-  set -x
   mpifort ${FFLAGS:-} helloworld.f90 -o helloworld1_f90 ${LDFLAGS:-}
-  set +x
-  ls -l helloworld1_f90
-  set -x
   $MPIEXEC -n 4 ./helloworld1_f90
-  set +x
 
-  # Опционально — старые интерфейсы, если нужны:
+  # Optionaly test old interfaces
   if command -v mpif77 >/dev/null 2>&1; then
     echo "== mpif77 -show =="; mpif77 -show || true
-    set -x
     mpif77  ${FFLAGS:-} helloworld.f   -o helloworld2_f   ${LDFLAGS:-}
     $MPIEXEC -n 4 ./helloworld2_f
-    set +x
   fi
 
   if command -v mpif90 >/dev/null 2>&1; then
     echo "== mpif90 -show =="; mpif90 -show || true
-    set -x
     mpif90  ${FFLAGS:-} helloworld.f90 -o helloworld2_f90 ${LDFLAGS:-}
     $MPIEXEC -n 4 ./helloworld2_f90
-    set +x
   fi
 fi
-
-
-
-
 
 popd

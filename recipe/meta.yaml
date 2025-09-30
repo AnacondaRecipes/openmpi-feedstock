@@ -93,6 +93,8 @@ outputs:
         - {{ pin_subpackage('openmpi', exact=True) }}
         - {{ compiler('fortran') }}
     test:
+      requires:
+        - {{ compiler('fortran') }}
       script: run_test.sh
       files:
         - mpiexec.sh
