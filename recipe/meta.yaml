@@ -23,7 +23,6 @@ outputs:
         - {{ pin_subpackage('openmpi', min_pin='x.x.x', max_pin='x.x') }}
     requirements:
       build:
-        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - {{ compiler('fortran') }}
