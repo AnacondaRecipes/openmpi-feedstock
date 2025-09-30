@@ -210,7 +210,7 @@ if [[ $PKG_NAME == "openmpi-mpifort" ]]; then
   [[ -f helloworld.f   ]] || { echo "helloworld.f not found"; exit 1; }
   [[ -f helloworld.f90 ]] || true
 
-  # set -x
+  set -x
   # gfortran --version
   # "$FC_BIN" --version
   # "$FC_BIN" ${FFLAGS:-} $CMP_FLAGS -c ./helloworld.f   -o hello_f.o
@@ -218,43 +218,40 @@ if [[ $PKG_NAME == "openmpi-mpifort" ]]; then
   # set +x
   # $MPIEXEC -n 4 ./helloworld1_f
 
-  set -x
-  echo ${FFLAGS}
-  echo ${LDFLAGS}
-  mpifort ${FFLAGS:-} helloworld.f -o helloworld1_f ${LDFLAGS:-}
+  gfortran helloworld.f -c -o hello_f.o $(mpifort -showme:compile)
+  gfortran hello_f.o -o helloworld1_f  $(mpifort -showme:link)
+ 
   set +x
-  $MPIEXEC -n 4 ./helloworld1_f
 
+#   if [[ -f helloworld.f90 ]]; then
+#     set -x
+#     "$FC_BIN" ${FFLAGS:-} $CMP_FLAGS -c ./helloworld.f90 -o hello_f90.o
+#     "$FC_BIN" hello_f90.o $LNK_FLAGS ${LDFLAGS:-}        -o helloworld1_f90
+#     set +x
+#     $MPIEXEC -n 4 ./helloworld1_f90
+#   fi
 
-  if [[ -f helloworld.f90 ]]; then
-    set -x
-    "$FC_BIN" ${FFLAGS:-} $CMP_FLAGS -c ./helloworld.f90 -o hello_f90.o
-    "$FC_BIN" hello_f90.o $LNK_FLAGS ${LDFLAGS:-}        -o helloworld1_f90
-    set +x
-    $MPIEXEC -n 4 ./helloworld1_f90
-  fi
+#   if command -v mpif77 >/dev/null 2>&1; then
+#     F77_CMP="$(mpif77 -showme:compile 2>/dev/null || true)"
+#     F77_LNK="$(mpif77 -showme:link    2>/dev/null || true)"
+#     F77_CMP="$(printf '%s\n' "$F77_CMP" | sed -E 's/(^|[[:space:]])-Wl,[^[:space:]]+//g')"
+#     set -x
+#     "$FC_BIN" ${FFLAGS:-} $F77_CMP -c ./helloworld.f -o hello_f77.o
+#     "$FC_BIN" hello_f77.o $F77_LNK ${LDFLAGS:-}      -o helloworld2_f
+#     set +x
+#     $MPIEXEC -n 4 ./helloworld2_f
+#   fi
 
-  if command -v mpif77 >/dev/null 2>&1; then
-    F77_CMP="$(mpif77 -showme:compile 2>/dev/null || true)"
-    F77_LNK="$(mpif77 -showme:link    2>/dev/null || true)"
-    F77_CMP="$(printf '%s\n' "$F77_CMP" | sed -E 's/(^|[[:space:]])-Wl,[^[:space:]]+//g')"
-    set -x
-    "$FC_BIN" ${FFLAGS:-} $F77_CMP -c ./helloworld.f -o hello_f77.o
-    "$FC_BIN" hello_f77.o $F77_LNK ${LDFLAGS:-}      -o helloworld2_f
-    set +x
-    $MPIEXEC -n 4 ./helloworld2_f
-  fi
-
-  if command -v mpif90 >/dev/null 2>&1 && [[ -f helloworld.f90 ]]; then
-    F90_CMP="$(mpif90 -showme:compile 2>/dev/null || true)"
-    F90_LNK="$(mpif90 -showme:link    2>/dev/null || true)"
-    F90_CMP="$(printf '%s\n' "$F90_CMP" | sed -E 's/(^|[[:space:]])-Wl,[^[:space:]]+//g')"
-    set -x
-    "$FC_BIN" ${FFLAGS:-} $F90_CMP -c ./helloworld.f90 -o hello_f90b.o
-    "$FC_BIN" hello_f90b.o $F90_LNK ${LDFLAGS:-}       -o helloworld2_f90
-    set +x
-    $MPIEXEC -n 4 ./helloworld2_f90
-  fi
+#   if command -v mpif90 >/dev/null 2>&1 && [[ -f helloworld.f90 ]]; then
+#     F90_CMP="$(mpif90 -showme:compile 2>/dev/null || true)"
+#     F90_LNK="$(mpif90 -showme:link    2>/dev/null || true)"
+#     F90_CMP="$(printf '%s\n' "$F90_CMP" | sed -E 's/(^|[[:space:]])-Wl,[^[:space:]]+//g')"
+#     set -x
+#     "$FC_BIN" ${FFLAGS:-} $F90_CMP -c ./helloworld.f90 -o hello_f90b.o
+#     "$FC_BIN" hello_f90b.o $F90_LNK ${LDFLAGS:-}       -o helloworld2_f90
+#     set +x
+#     $MPIEXEC -n 4 ./helloworld2_f90
+#   fi
 fi
 
 
