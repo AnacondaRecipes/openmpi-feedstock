@@ -53,16 +53,26 @@ if [[ $PKG_NAME == "openmpi-mpifort" ]]; then
     export OMPI_MCA_rmaps_base_oversubscribe=yes
     export OMPI_MCA_btl_vader_single_copy_mechanism=none
 
-  #   gfortran helloworld.f -c -o hello_f.o $(mpifort -showme:compile)
-  #   gfortran hello_f.o -o helloworld1_f  $(mpifort -showme:link)
-  #   exit 0
+    gfortran helloworld.f -c -o hello_f.o $(mpifort -showme:compile)
+    gfortran hello_f.o -o helloworld1_f  $(mpifort -showme:link)
+    $MPIEXEC -n 4 ./helloworld1_f
+
+    gfortran helloworld.f -c -o hello_f.o $(mpif77 -showme:compile)
+    gfortran hello_f.o -o helloworld2_f $(mpif77 -showme:link)
+    $MPIEXEC -n 4 ./helloworld2_f
+
+    gfortran helloworld.f90 -c -o hello_f90.o $(mpif90 -showme:compile)
+    gfortran hello_f90.o -o helloworld2_f90 $(mpif90 -showme:link)
+    $MPIEXEC -n 4 ./helloworld2_f90
+
+    exit 0
   fi
 
-  # mpifort ${FFLAGS:-} helloworld.f   -o helloworld1_f   ${LDFLAGS:-}
-  # $MPIEXEC -n 4 ./helloworld1_f
+  mpifort ${FFLAGS:-} helloworld.f   -o helloworld1_f   ${LDFLAGS:-}
+  $MPIEXEC -n 4 ./helloworld1_f
 
-  # mpifort ${FFLAGS:-} helloworld.f90 -o helloworld1_f90 ${LDFLAGS:-}
-  # $MPIEXEC -n 4 ./helloworld1_f90
+  mpifort ${FFLAGS:-} helloworld.f90 -o helloworld1_f90 ${LDFLAGS:-}
+  $MPIEXEC -n 4 ./helloworld1_f90
 
   # Optionaly test old interfaces
   if command -v mpif77 >/dev/null 2>&1; then
