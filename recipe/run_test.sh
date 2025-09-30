@@ -5,6 +5,13 @@ export OMPI_MCA_plm=isolated
 export OMPI_MCA_btl_vader_single_copy_mechanism=none
 export OMPI_MCA_rmaps_base_oversubscribe=yes
 
+if [[ "$(uname)" == "Darwin" ]]; then
+  export OMPI_MCA_btl=self,tcp
+  export OMPI_MCA_btl_tcp_if_include=lo0
+  export OMPI_MCA_oob_tcp_if_include=lo0
+  export OMPI_MCA_pml=ob1
+fi
+
 MPIEXEC="${PWD}/mpiexec.sh"
 
 pushd "tests"

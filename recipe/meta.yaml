@@ -29,12 +29,14 @@ outputs:
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - {{ compiler('fortran') }}
-        - make  # [unix]
-        - autoconf  # [unix]
-        - automake  # [unix]
-        - perl 5.26.2  # [not arm64]
-        - perl >=5.26  # [arm64]
-        - libtool
+        - make                     # [unix]
+        - autoconf                 # [unix]
+        - automake                 # [unix]
+        - libtool                  # [unix]
+        - m4                       # [unix]
+        - perl 5.26.2              # [not arm64]
+        - perl >=5.26              # [arm64]
+        - pkg-config               # [unix]
       host:
         - zlib {{ zlib }}
       run:
@@ -61,11 +63,11 @@ outputs:
         - {{ pin_subpackage('openmpi', exact=True) }}
         # host C compilers work fine (better) on mac
         - {{ compiler('c') }}
-    # test:
-    #   script: run_test.sh
-    #   files:
-    #     - mpiexec.sh
-    #     - tests/helloworld.c
+    test:
+      script: run_test.sh
+      files:
+        - mpiexec.sh
+        - tests/helloworld.c
 
   - name: openmpi-mpicxx
     build:
@@ -82,11 +84,11 @@ outputs:
         - {{ pin_subpackage('openmpi', exact=True) }}
         # host C compilers work fine (better) on mac
         - {{ compiler('cxx') }}
-    # test:
-    #   script: run_test.sh
-    #   files:
-    #     - mpiexec.sh
-    #     - tests/helloworld.cxx
+    test:
+      script: run_test.sh
+      files:
+        - mpiexec.sh
+        - tests/helloworld.cxx
 
   - name: openmpi-mpifort
     build:

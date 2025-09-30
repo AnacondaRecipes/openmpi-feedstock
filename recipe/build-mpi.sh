@@ -34,19 +34,6 @@ fi
 
 export LIBRARY_PATH="$PREFIX/lib"
 
-# ./configure --prefix=$PREFIX \
-#             --disable-dependency-tracking \
-#             ${EXTRA_CONF} --enable-ipv6 \
-#             --enable-mpi-cxx \
-#             --enable-mpi-fortran \
-#             --disable-wrapper-rpath \
-#             --disable-wrapper-runpath \
-#             --with-wrapper-cflags="-I$PREFIX/include" \
-#             --with-wrapper-cxxflags="-I$PREFIX/include" \
-#             --with-wrapper-fcflags="-I$PREFIX/include" \
-#             --with-wrapper-ldflags="-L$PREFIX/lib -Wl,-rpath,$PREFIX/lib" \
-#             --with-sge
-
 # ==== detect OMPI major from VERSION ====
 # if major <5, then adding binding --enable-mpi-cxx. Since version =>5 droped this option
 OMPI_MAJOR=""
@@ -74,8 +61,6 @@ fi
   --with-wrapper-fcflags="-I${PREFIX}/include" \
   --with-wrapper-ldflags="-L${PREFIX}/lib -Wl,-rpath,${PREFIX}/lib" \
   --with-sge
-
-
 
 make -j"${CPU_COUNT:-1}"
 make install
