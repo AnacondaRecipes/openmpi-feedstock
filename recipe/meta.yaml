@@ -110,7 +110,7 @@ about:
     description: |
         The Open MPI Project is an open source Message Passing Interface
         implementation that is developed and maintained by a consortium of academic,
-        research, and industry partners
+        research, and industry partners.
     doc_url: https://www.open-mpi.org/doc
     dev_url: https://github.com/open-mpi/ompi
 
