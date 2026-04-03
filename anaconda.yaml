@@ -1,8 +1,8 @@
 anaconda_config_version: 1
 upstream_sources:
   - webpage:
-      url: https://download.open-mpi.org/release/open-mpi/v()/openmpi-{}.tar.bz2
-      regex: (?:.*)openmpi-(.*)\.tar\.gz
+      url: https://www.open-mpi.org/software/ompi
+      regex: openmpi-([\d.]+)\.tar\.gz
     packages:
       - openmpi
       - openmpi-mpicc
