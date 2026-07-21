@@ -82,6 +82,7 @@ outputs:
 
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
       run:
