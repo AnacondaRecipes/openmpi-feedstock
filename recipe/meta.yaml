@@ -63,10 +63,10 @@ outputs:
         - {{ compiler('c') }}
       run:
         - {{ pin_subpackage('openmpi', exact=True) }}
-        # host C compilers work fine (better) on mac
-        # - {{ compiler('c') }}
 
     test:
+      requires:
+        - {{ compiler('c') }}
       script: run_test.sh
       files:
         - mpiexec.sh
@@ -87,10 +87,10 @@ outputs:
         - {{ compiler('cxx') }}
       run:
         - {{ pin_subpackage('openmpi', exact=True) }}
-        # host C compilers work fine (better) on mac
-        # - {{ compiler('cxx') }}
 
     test:
+      requires:
+        - {{ compiler('cxx') }}
       script: run_test.sh
       files:
         - mpiexec.sh
@@ -109,7 +109,6 @@ outputs:
         - {{ compiler('fortran') }}
       run:
         - {{ pin_subpackage('openmpi', exact=True) }}
-        # - {{ compiler('fortran') }}
 
     test:
       requires:
