@@ -58,15 +58,11 @@ outputs:
         - echo "{{CONDA_BUILD_SYSROOT}}"  # [osx]
 
     requirements:
-      build:
-        - {{ stdlib('c') }}
-        - {{ compiler('c') }}
       run:
         - {{ pin_subpackage('openmpi', exact=True) }}
+        - {{ compiler('c') }}
 
     test:
-      requires:
-        - {{ compiler('c') }}
       script: run_test.sh
       files:
         - mpiexec.sh
@@ -81,16 +77,11 @@ outputs:
         - echo "{{CONDA_BUILD_SYSROOT}}"  # [osx]
 
     requirements:
-      build:
-        - {{ stdlib('c') }}
-        - {{ compiler('c') }}
-        - {{ compiler('cxx') }}
       run:
         - {{ pin_subpackage('openmpi', exact=True) }}
+        - {{ compiler('cxx') }}
 
     test:
-      requires:
-        - {{ compiler('cxx') }}
       script: run_test.sh
       files:
         - mpiexec.sh
@@ -105,10 +96,9 @@ outputs:
         - echo "{{CONDA_BUILD_SYSROOT}}"  # [osx]
 
     requirements:
-      build:
-        - {{ compiler('fortran') }}
       run:
         - {{ pin_subpackage('openmpi', exact=True) }}
+        - {{ compiler('fortran') }}
 
     test:
       requires:
